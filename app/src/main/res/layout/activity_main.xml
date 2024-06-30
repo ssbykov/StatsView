@@ -11,10 +11,15 @@
         android:id="@+id/statsView"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:text="Hello World!"
+        app:color1="#391279"
+        app:color2="#939124"
+        app:color3="#182957"
+        app:color4="#582012"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:lineWidth="16dp"
+        app:textSize="20sp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

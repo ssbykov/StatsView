@@ -13,10 +13,10 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         findViewById<StatsView>(R.id.statsView).data = listOf(
-            0.30F,
-            0.30F,
-            0.40F,
-            0.10F,
+            0.25F,
+            0.25F,
+            0.25F,
+            0.25F,
         )
     }
 }
