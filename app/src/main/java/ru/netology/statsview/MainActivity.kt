@@ -12,11 +12,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        findViewById<StatsView>(R.id.statsView).data = listOf(
+        findViewById<StatsView>(R.id.statsView).data = Pair(listOf(
             500F,
             500F,
             500F,
-            500F,
-        )
+        ), 500F)
     }
 }

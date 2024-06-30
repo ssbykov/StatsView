@@ -42,7 +42,8 @@ class StatsView @JvmOverloads constructor(
         }
     }
 
-    var data = emptyList<Float>()
+    var total = 0F
+    var data = Pair(emptyList<Float>(), 0F)
         set(value) {
             field = value
             invalidate()
@@ -78,23 +79,26 @@ class StatsView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        if (data.isNotEmpty()) {
+        paint.color = context.getColor(R.color.gray)
+        canvas.drawCircle(center.x, center.y, radius, paint)
+        val total = data.first.sum() + data.second
+        if (data.first.isNotEmpty()) {
             var startAngle = -90F
-            data.forEachIndexed { index, datum ->
-                val angle = datum / data.sum() * 360
+            data.first.forEachIndexed { index, datum ->
+                val angle = datum / total * 360
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
                 canvas.drawArc(oval, startAngle, angle, false, paint)
                 startAngle += angle
             }
             paint.color = colors.getOrElse(0) { generateRandomColor() }
             canvas.drawPoint(center.x, center.y - radius, paint)
-            canvas.drawText(
-                "100.00%",
-                center.x,
-                center.y + textPaint.textSize / 4,
-                textPaint
-            )
         }
+        canvas.drawText(
+            "%.2f%%".format((total - data.second) / total * 100),
+            center.x,
+            center.y + textPaint.textSize / 4,
+            textPaint
+        )
     }
 
     private fun generateRandomColor() = Random.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
