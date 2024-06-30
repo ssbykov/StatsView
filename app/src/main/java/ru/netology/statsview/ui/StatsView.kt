@@ -37,6 +37,7 @@ class StatsView @JvmOverloads constructor(
                 getColor(R.styleable.StatsView_color2, generateRandomColor()),
                 getColor(R.styleable.StatsView_color3, generateRandomColor()),
                 getColor(R.styleable.StatsView_color4, generateRandomColor()),
+                getColor(R.styleable.StatsView_color1, generateRandomColor()),
             )
         }
     }
@@ -85,6 +86,8 @@ class StatsView @JvmOverloads constructor(
                 canvas.drawArc(oval, startAngle, angle, false, paint)
                 startAngle += angle
             }
+            paint.color = colors.getOrElse(0) { generateRandomColor() }
+            canvas.drawPoint(center.x, center.y - radius, paint)
             canvas.drawText(
                 "100.00%",
                 center.x,
