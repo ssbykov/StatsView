@@ -1,5 +1,6 @@
 package ru.netology.statsview.ui
 
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -82,19 +83,25 @@ class StatsView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        paint.color = context.getColor(R.color.gray)
-        canvas.drawCircle(center.x, center.y, radius, paint)
         val total = data.first.sum() + data.second
         if (data.first.isNotEmpty()) {
             var startAngle = -90F
             data.first.forEachIndexed { index, datum ->
                 val angle = datum / total * 360
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
-                canvas.drawArc(oval, startAngle, angle * progress, false, paint)
+                canvas.drawArc(
+                    oval,
+                    startAngle + 360 * progress,
+                    angle * progress,
+                    false,
+                    paint
+                )
                 startAngle += angle
             }
-            paint.color = colors.getOrElse(0) { generateRandomColor() }
-            canvas.drawPoint(center.x, center.y - radius, paint)
+            if (progress == 1F) {
+                paint.color = colors.getOrElse(0) { generateRandomColor() }
+                canvas.drawPoint(center.x, center.y - radius, paint)
+            }
         }
         canvas.drawText(
             "%.2f%%".format((total - data.second) / total * 100),
@@ -116,7 +123,7 @@ class StatsView @JvmOverloads constructor(
                 progress = anim.animatedValue as Float
                 invalidate()
             }
-            duration = 1500
+            duration = 2500
             interpolator = LinearInterpolator()
         }.also {
             it.start()
