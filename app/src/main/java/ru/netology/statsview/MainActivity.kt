@@ -1,6 +1,7 @@
 package ru.netology.statsview
 
 import android.os.Bundle
+import android.view.animation.AnimationUtils
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,10 +13,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        findViewById<StatsView>(R.id.statsView).data = Pair(listOf(
-            500F,
-            500F,
-            500F,
-        ), 500F)
+        val view = findViewById<StatsView>(R.id.statsView)
+        view.data = Pair(
+            listOf(
+                500F,
+                500F,
+                500F,
+                500F,
+            ), 0F
+        )
+
     }
+
 }
