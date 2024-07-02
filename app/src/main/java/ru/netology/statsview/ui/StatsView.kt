@@ -11,6 +11,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.content.withStyledAttributes
+import kotlinx.coroutines.delay
 import ru.netology.statsview.R
 import ru.netology.statsview.utils.AndroidUtils
 import kotlin.math.min
@@ -29,12 +30,14 @@ class StatsView @JvmOverloads constructor(
 ) {
     private var textSize = AndroidUtils.dp(context, 20).toFloat()
     private var lineWidth = AndroidUtils.dp(context, 5).toFloat()
+    private var animFormat = 0
     private var colors = emptyList<Int>()
 
     init {
         context.withStyledAttributes(attributeSet, R.styleable.StatsView) {
             textSize = getDimension(R.styleable.StatsView_textSize, textSize)
             lineWidth = getDimension(R.styleable.StatsView_lineWidth, lineWidth)
+            animFormat = getInteger(R.styleable.StatsView_animFormat, animFormat)
             colors = listOf(
                 getColor(R.styleable.StatsView_color1, generateRandomColor()),
                 getColor(R.styleable.StatsView_color2, generateRandomColor()),
@@ -91,7 +94,10 @@ class StatsView @JvmOverloads constructor(
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
                 canvas.drawArc(
                     oval,
-                    startAngle + 360 * progress,
+                    when(animFormat) {
+                        3 -> startAngle + angle / 2f * (1 - progress)
+                        else -> startAngle + 360 * progress
+                    },
                     angle * progress,
                     false,
                     paint
@@ -123,7 +129,7 @@ class StatsView @JvmOverloads constructor(
                 progress = anim.animatedValue as Float
                 invalidate()
             }
-            duration = 2500
+            duration = 2000
             interpolator = LinearInterpolator()
         }.also {
             it.start()
