@@ -4,6 +4,7 @@
         <attr name="textSize" format="dimension|reference" />
         <attr name="lineWidth" format="dimension|reference" />
         <attr name="animFormat" format="enum" >
+            <enum name="stat" value="0"/>
             <enum name="rotation" value="1"/>
             <enum name="sequential" value="2"/>
             <enum name="bidirectional" value="3"/>

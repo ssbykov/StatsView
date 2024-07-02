@@ -117,8 +117,8 @@ class StatsView @JvmOverloads constructor(
     private fun calcStartAngle(startAngle: Float, angle: Float, animFormat: Int): Float {
         return when (animFormat) {
             3 -> startAngle + angle / 2f * (1 - progress)
-            2 -> startAngle
-            else -> startAngle + 360 * progress
+            1 -> startAngle + 360 * progress
+            else -> startAngle
         }
     }
 
@@ -129,7 +129,8 @@ class StatsView @JvmOverloads constructor(
                 in (-90F..startAngle) -> 0F
                 else -> angle
             }
-        } else angle * progress
+        } else if (animFormat == 0) angle
+        else angle * progress
     }
 
     private fun update() {

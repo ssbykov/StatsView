@@ -15,7 +15,7 @@
         app:color2="#4CAF50"
         app:color3="#FFEB3B"
         app:color4="#FF0266"
-        app:animFormat="sequential"
+        app:animFormat="bidirectional"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
