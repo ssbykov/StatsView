@@ -94,11 +94,8 @@ class StatsView @JvmOverloads constructor(
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
                 canvas.drawArc(
                     oval,
-                    when(animFormat) {
-                        3 -> startAngle + angle / 2f * (1 - progress)
-                        else -> startAngle + 360 * progress
-                    },
-                    angle * progress,
+                    calcStartAngle(startAngle, angle, animFormat),
+                    calcAngle(startAngle, angle, animFormat),
                     false,
                     paint
                 )
@@ -117,6 +114,24 @@ class StatsView @JvmOverloads constructor(
         )
     }
 
+    private fun calcStartAngle(startAngle: Float, angle: Float, animFormat: Int): Float {
+        return when (animFormat) {
+            3 -> startAngle + angle / 2f * (1 - progress)
+            2 -> startAngle
+            else -> startAngle + 360 * progress
+        }
+    }
+
+    private fun calcAngle(startAngle: Float, angle: Float, animFormat: Int): Float {
+        return if (animFormat == 2) {
+            when (360 * progress - 90F) {
+                in (startAngle..startAngle + angle) -> 360 * progress - (startAngle + 90F)
+                in (-90F..startAngle) -> 0F
+                else -> angle
+            }
+        } else angle * progress
+    }
+
     private fun update() {
         valueAnimator?.let {
             it.removeAllListeners()
@@ -129,7 +144,7 @@ class StatsView @JvmOverloads constructor(
                 progress = anim.animatedValue as Float
                 invalidate()
             }
-            duration = 2000
+            duration = 2500
             interpolator = LinearInterpolator()
         }.also {
             it.start()
