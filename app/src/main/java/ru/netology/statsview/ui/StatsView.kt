@@ -1,5 +1,7 @@
 package ru.netology.statsview.ui
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -7,7 +9,9 @@ import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.core.content.withStyledAttributes
+import kotlinx.coroutines.delay
 import ru.netology.statsview.R
 import ru.netology.statsview.utils.AndroidUtils
 import kotlin.math.min
@@ -26,12 +30,14 @@ class StatsView @JvmOverloads constructor(
 ) {
     private var textSize = AndroidUtils.dp(context, 20).toFloat()
     private var lineWidth = AndroidUtils.dp(context, 5).toFloat()
+    private var animFormat = 0
     private var colors = emptyList<Int>()
 
     init {
         context.withStyledAttributes(attributeSet, R.styleable.StatsView) {
             textSize = getDimension(R.styleable.StatsView_textSize, textSize)
             lineWidth = getDimension(R.styleable.StatsView_lineWidth, lineWidth)
+            animFormat = getInteger(R.styleable.StatsView_animFormat, animFormat)
             colors = listOf(
                 getColor(R.styleable.StatsView_color1, generateRandomColor()),
                 getColor(R.styleable.StatsView_color2, generateRandomColor()),
@@ -42,11 +48,12 @@ class StatsView @JvmOverloads constructor(
         }
     }
 
-    var total = 0F
+    private var progress = 0F
+    private var valueAnimator: ValueAnimator? = null
     var data = Pair(emptyList<Float>(), 0F)
         set(value) {
             field = value
-            invalidate()
+            update()
         }
     private var radius = 0F
     private var center = PointF()
@@ -79,19 +86,25 @@ class StatsView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        paint.color = context.getColor(R.color.gray)
-        canvas.drawCircle(center.x, center.y, radius, paint)
         val total = data.first.sum() + data.second
         if (data.first.isNotEmpty()) {
             var startAngle = -90F
             data.first.forEachIndexed { index, datum ->
                 val angle = datum / total * 360
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
-                canvas.drawArc(oval, startAngle, angle, false, paint)
+                canvas.drawArc(
+                    oval,
+                    calcStartAngle(startAngle, angle, animFormat),
+                    calcAngle(startAngle, angle, animFormat),
+                    false,
+                    paint
+                )
                 startAngle += angle
             }
-            paint.color = colors.getOrElse(0) { generateRandomColor() }
-            canvas.drawPoint(center.x, center.y - radius, paint)
+            if (progress == 1F) {
+                paint.color = colors.getOrElse(0) { generateRandomColor() }
+                canvas.drawPoint(center.x, center.y - radius, paint)
+            }
         }
         canvas.drawText(
             "%.2f%%".format((total - data.second) / total * 100),
@@ -99,6 +112,44 @@ class StatsView @JvmOverloads constructor(
             center.y + textPaint.textSize / 4,
             textPaint
         )
+    }
+
+    private fun calcStartAngle(startAngle: Float, angle: Float, animFormat: Int): Float {
+        return when (animFormat) {
+            3 -> startAngle + angle / 2f * (1 - progress)
+            1 -> startAngle + 360 * progress
+            else -> startAngle
+        }
+    }
+
+    private fun calcAngle(startAngle: Float, angle: Float, animFormat: Int): Float {
+        return if (animFormat == 2) {
+            when (360 * progress - 90F) {
+                in (startAngle..startAngle + angle) -> 360 * progress - (startAngle + 90F)
+                in (-90F..startAngle) -> 0F
+                else -> angle
+            }
+        } else if (animFormat == 0) angle
+        else angle * progress
+    }
+
+    private fun update() {
+        valueAnimator?.let {
+            it.removeAllListeners()
+            it.cancel()
+        }
+        progress = 0F
+
+        valueAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
+            addUpdateListener { anim ->
+                progress = anim.animatedValue as Float
+                invalidate()
+            }
+            duration = 2500
+            interpolator = LinearInterpolator()
+        }.also {
+            it.start()
+        }
     }
 
     private fun generateRandomColor() = Random.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())

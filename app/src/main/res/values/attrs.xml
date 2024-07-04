@@ -3,6 +3,12 @@
     <declare-styleable name="StatsView">
         <attr name="textSize" format="dimension|reference" />
         <attr name="lineWidth" format="dimension|reference" />
+        <attr name="animFormat" format="enum" >
+            <enum name="stat" value="0"/>
+            <enum name="rotation" value="1"/>
+            <enum name="sequential" value="2"/>
+            <enum name="bidirectional" value="3"/>
+        </attr>>
         <attr name="color1" format="color|reference" />
         <attr name="color2" format="color|reference" />
         <attr name="color3" format="color|reference" />
